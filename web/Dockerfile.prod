@@ -1,0 +1,27 @@
+# ── Build stage ──
+FROM dockerproxy.net/library/node:24-alpine AS builder
+
+# 使用阿里云 Alpine 镜像源加速 apk
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+
+# 配置 npm 使用国内镜像源，并启用重试以应对网络抖动
+RUN npm config set registry https://registry.npmmirror.com && \
+    npm config set fetch-retries 5 && \
+    npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000 && \
+    npm config set fetch-timeout 300000
+
+WORKDIR /build
+COPY package*.json ./
+RUN npm ci --prefer-offline 2>/dev/null || npm ci
+COPY . .
+RUN npm run build
+
+# ── Runtime stage ──
+FROM dockerproxy.net/library/nginx:1.27-alpine
+
+COPY --from=builder /build/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

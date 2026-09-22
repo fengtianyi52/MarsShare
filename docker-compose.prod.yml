@@ -1,0 +1,104 @@
+# Production stack for MarsShare.
+#
+# Topology:
+#
+#   client ──► nginx (host:80) ──► web static  (built-in)
+#                              └─► api  (internal :8080) ──► postgres (internal :5432)
+#                                  worker
+#
+# Only the nginx container exposes ports to the host. The api/worker/
+# postgres services live on Docker's internal compose network and are
+# reached via service-name DNS.
+#
+# Run with:  docker compose -f docker-compose.prod.yml up -d --build
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: marsshare
+      POSTGRES_USER: marsshare
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-marsshare}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U marsshare -d marsshare"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    # Explicit `:prod` tag avoids colliding with the dev compose stack,
+    # which uses `marsshare-api:latest` and would otherwise be reused
+    # here when `up -d` runs without `--build`.
+    image: marsshare-api:prod
+    build:
+      context: ./api
+      dockerfile: Dockerfile.prod
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgres://marsshare:marsshare@postgres:5432/marsshare?sslmode=disable}
+      LOCAL_STORAGE_PATH: ${LOCAL_STORAGE_PATH:-/data/storage}
+    # The API is no longer published to the host — nginx fronts it. We
+    # still `expose` :8080 so other compose services can reach it via
+    # the internal network.
+    expose:
+      - "8080"
+    volumes:
+      - ./data/storage:/data/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 30
+      start_period: 30s
+
+  worker:
+    # Reuse the api image — same binaries are baked in (Dockerfile.prod
+    # builds both /app/api and /app/worker). No `build` block here so we
+    # don't pay for a second identical build pass.
+    image: marsshare-api:prod
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgres://marsshare:marsshare@postgres:5432/marsshare?sslmode=disable}
+      LOCAL_STORAGE_PATH: ${LOCAL_STORAGE_PATH:-/data/storage}
+    volumes:
+      - ./data/storage:/data/storage
+    depends_on:
+      api:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    command: ["/app/worker"]
+
+  nginx:
+    # Single image that contains both the built SPA bundle and the
+    # reverse-proxy site config. Built from ./nginx/Dockerfile with the
+    # repo root as the build context (it needs both web/ and nginx/).
+    image: marsshare-nginx:prod
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      # Uncomment after wiring TLS certificates into the image (or via
+      # an extra volume mount + listen 443 ssl in nginx.conf):
+      # - "${HTTPS_PORT:-443}:443"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s

@@ -1,0 +1,37 @@
+# Docker build context excludes for the repository root.
+# Used by the nginx image, which uses the repo root as its build context
+# so it can read both web/ (for the SPA bundle) and nginx/ (for the
+# site config) from a single Dockerfile.
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+.gitmodules
+
+# Editor / OS noise
+.idea/
+.vscode/
+.claude/
+.DS_Store
+Thumbs.db
+
+# Build artifacts — the builder stage will produce a fresh dist
+**/node_modules/
+**/dist/
+**/build/
+
+# Local data and storage that absolutely must not leak into images
+data/
+**/*.log
+**/.env
+**/.env.*
+
+# Other apps that don't belong in the nginx image
+api/
+docs/
+
+# Compose / docs / scratch
+docker-compose*.yml
+*.md
+LICENSE

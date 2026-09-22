@@ -1,0 +1,168 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   Material Design 2 — Color tokens
+   颜色以 RGB 三元组形式存储,便于 Tailwind 的 / <alpha-value> 透明度叠加
+   ========================================================================== */
+@layer base {
+  :root {
+    /* Brand */
+    --md-primary: 33 150 243;          /* #2196F3 Blue 500 */
+    --md-primary-dark: 25 118 210;     /* #1976D2 Blue 700 */
+    --md-primary-light: 187 222 251;   /* #BBDEFB Blue 100 */
+    --md-on-primary: 255 255 255;
+    --md-secondary: 3 169 244;         /* #03A9F4 Light Blue 500 */
+    --md-on-secondary: 255 255 255;
+    --md-secondary-container: 179 229 252; /* #B3E5FC Light Blue 100 */
+    --md-on-secondary-container: 1 87 155;  /* #01579B */
+
+    /* Surface */
+    --md-background: 250 250 250;      /* #FAFAFA Grey 50 */
+    --md-surface: 255 255 255;         /* #FFFFFF */
+    --md-surface-variant: 245 245 245; /* #F5F5F5 Grey 100 */
+    --md-on-surface: 33 33 33;         /* #212121 Grey 900 */
+    --md-on-surface-variant: 97 97 97; /* #616161 Grey 700 */
+    --md-divider: 224 224 224;         /* #E0E0E0 Grey 300 */
+    --md-outline: 189 189 189;         /* #BDBDBD Grey 400 */
+
+    /* Status */
+    --md-error: 244 67 54;             /* #F44336 Red 500 */
+    --md-on-error: 255 255 255;
+    --md-error-container: 255 235 238; /* #FFEBEE Red 50 */
+    --md-on-error-container: 183 28 28;/* #B71C1C */
+    --md-success: 76 175 80;           /* #4CAF50 Green 500 */
+    --md-warning: 255 152 0;            /* #FF9800 Orange 500 */
+
+    /* MD2 Elevation —— 严格按 spec */
+    --md-elevation-1: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    --md-elevation-2: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    --md-elevation-4: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    --md-elevation-6: 0 12px 24px rgba(0, 0, 0, 0.22), 0 8px 8px rgba(0, 0, 0, 0.24);
+    --md-elevation-8: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+    --md-elevation-16: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
+
+    color-scheme: light;
+  }
+
+  html.dark {
+    --md-primary: 100 181 246;         /* #64B5F6 Blue 300 — 暗色更亮 */
+    --md-primary-dark: 33 150 243;     /* #2196F3 */
+    --md-primary-light: 30 58 95;      /* #1E3A5F 深蓝容器 */
+    --md-on-primary: 13 39 66;
+    --md-secondary: 79 195 247;        /* #4FC3F7 Light Blue 300 */
+    --md-on-secondary: 6 46 69;
+    --md-secondary-container: 30 50 70;
+    --md-on-secondary-container: 179 229 252;
+
+    --md-background: 18 18 18;         /* #121212 MD2 dark spec */
+    --md-surface: 30 30 30;            /* #1E1E1E elevation 1dp */
+    --md-surface-variant: 44 44 44;    /* #2C2C2C elevation 2dp */
+    --md-on-surface: 224 224 224;      /* #E0E0E0 */
+    --md-on-surface-variant: 158 158 158;/* #9E9E9E */
+    --md-divider: 44 44 44;
+    --md-outline: 66 66 66;
+
+    --md-error: 239 83 80;
+    --md-error-container: 60 20 20;
+    --md-on-error-container: 255 205 210;
+    --md-success: 102 187 106;
+    --md-warning: 255 167 38;
+
+    /* Dark mode 阴影更深 */
+    --md-elevation-1: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.6);
+    --md-elevation-2: 0 3px 6px rgba(0, 0, 0, 0.5), 0 3px 6px rgba(0, 0, 0, 0.6);
+    --md-elevation-4: 0 10px 20px rgba(0, 0, 0, 0.6), 0 6px 6px rgba(0, 0, 0, 0.7);
+    --md-elevation-6: 0 12px 24px rgba(0, 0, 0, 0.65), 0 8px 8px rgba(0, 0, 0, 0.75);
+    --md-elevation-8: 0 14px 28px rgba(0, 0, 0, 0.7), 0 10px 10px rgba(0, 0, 0, 0.8);
+    --md-elevation-16: 0 19px 38px rgba(0, 0, 0, 0.75), 0 15px 12px rgba(0, 0, 0, 0.85);
+
+    color-scheme: dark;
+  }
+
+  * {
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
+
+  html,
+  body {
+    @apply min-h-screen bg-background text-surface-on antialiased;
+  }
+
+  /* ========================================================================
+     Material Design 2 — Input focus animation
+     一条 2px 主题色下划线在 input 底部从 0% 平滑扩展到 100%。
+     用 background-image 实现，叠加在已有的 background-color 之上，不影响
+     现有 Tailwind 边框/背景类。
+     ======================================================================== */
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']):not([type='color']),
+  textarea,
+  select {
+    background-image: linear-gradient(to right, rgb(var(--md-primary)), rgb(var(--md-primary)));
+    background-position: bottom center;
+    background-size: 0% 2px;
+    background-repeat: no-repeat;
+    transition-property: background-color, background-size, border-color, color, box-shadow;
+    transition-duration: 220ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']):not([type='color']):focus,
+  textarea:focus,
+  select:focus {
+    background-size: 100% 2px;
+  }
+}
+
+/* ==========================================================================
+   Components
+   ========================================================================== */
+@layer components {
+  /* MD2 Outlined input */
+  .input-field {
+    @apply w-full px-4 py-2.5 rounded bg-surface text-surface-on
+           border border-outline
+           placeholder:text-surface-on-variant/60
+           focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary
+           transition-colors;
+  }
+
+  /* MD2 Contained Button */
+  .md-btn {
+    @apply inline-flex items-center justify-center gap-2
+           px-4 h-9 rounded text-sm font-medium uppercase tracking-wider
+           shadow-elevation-1 hover:shadow-elevation-2 active:shadow-elevation-1
+           transition-all;
+  }
+  .md-btn-primary {
+    @apply md-btn bg-primary text-primary-on hover:bg-primary-dark;
+  }
+  .md-btn-text {
+    @apply inline-flex items-center justify-center gap-2
+           px-3 h-9 rounded text-sm font-medium uppercase tracking-wider
+           text-primary hover:bg-primary/10 transition-colors;
+  }
+
+  /* Ripple host */
+  .ripple-host {
+    @apply relative overflow-hidden;
+  }
+}
+
+/* ==========================================================================
+   Utilities
+   ========================================================================== */
+@layer utilities {
+  /* 让 .scrollbar-thin 区域细化滚动条 */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgb(var(--md-outline) / 0.6);
+    border-radius: 9999px;
+  }
+}
