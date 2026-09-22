@@ -32,7 +32,7 @@ services:
       LOCAL_STORAGE_PATH: ${LOCAL_STORAGE_PATH:-/data/storage}
       WORKER_INTERVAL: ${WORKER_INTERVAL:-30s}
     ports:
-      - "8080:8080"
+      - "${API_PORT:-8081}:8080"
     volumes:
       - ./api:/app
       - ./data/storage:/data/storage

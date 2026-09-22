@@ -27,7 +27,7 @@ docker compose up --build
 3. 访问：
 
 - 前端：`http://localhost:5173`
-- API：`http://localhost:8080/api`
+- API：`http://localhost:8081/api`
 
 ## 当前实现范围
 
@@ -39,4 +39,3 @@ docker compose up --build
 ## 管理员引导
 
 服务启动时会使用 `.env` 中的 `BOOTSTRAP_ADMIN_EMAIL` 和 `BOOTSTRAP_ADMIN_PASSWORD` 自动创建管理员。
-

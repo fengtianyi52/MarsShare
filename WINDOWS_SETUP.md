@@ -21,8 +21,8 @@ docker compose up --build
 Open:
 
 - Web: http://localhost:5173
-- API: http://localhost:8080/api
-- Health check: http://localhost:8080/healthz
+- API: http://localhost:8081/api
+- Health check: http://localhost:8081/healthz
 - Mailpit when enabled: http://localhost:8025
 
 The first startup creates the PostgreSQL schema and bootstraps the administrator

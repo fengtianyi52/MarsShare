@@ -19,7 +19,7 @@ cp .env.example .env   # 首次需要
 docker compose up --build
 ```
 
-前端: http://localhost:5173 | API: http://localhost:8080/api | 健康检查: GET /healthz
+前端: http://localhost:5173 | API: http://localhost:8081/api | 健康检查: http://localhost:8081/healthz
 
 启动时自动运行 Goose 迁移并用 `.env` 中的 `BOOTSTRAP_ADMIN_EMAIL` / `BOOTSTRAP_ADMIN_PASSWORD` 创建管理员。
 
